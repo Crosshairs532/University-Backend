@@ -87,6 +87,11 @@ const studentSchema = new Schema<Student>({
   guardian: guardianSchema,
   localGuardian: localGuradianSchema,
   profileImg: { type: String },
+  admissionSemester: {
+    type: Schema.Types.ObjectId,
+    ref: 'admissionSemester',
+    required: true,
+  },
   isActive: ['active', 'blocked'],
 });
 
