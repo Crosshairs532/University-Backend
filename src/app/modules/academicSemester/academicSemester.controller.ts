@@ -17,7 +17,31 @@ const createAcademicSemester = catchAsync(
     });
   },
 );
+const getAllAcademicSemester = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const all = await academicSemesterService.getAllAcademicSemesterDb();
+    sendResponse(res, {
+      success: true,
+      message: 'All Academic Semesters are retrieved',
+      data: all,
+    });
+  },
+);
+const getSingleAcademicSemester = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const single =
+      await academicSemesterService.getSingleAcademicSemesterDb(id);
+    sendResponse(res, {
+      success: true,
+      message: 'Single Academic Semesters is retrieved',
+      data: single,
+    });
+  },
+);
 
 export const academicSemesterController = {
   createAcademicSemester,
+  getAllAcademicSemester,
+  getSingleAcademicSemester,
 };
