@@ -20,3 +20,7 @@ export type TAcademicSemester = {
   startMonth: Month;
   endMonth: Month;
 };
+
+export type TCodeChekcer = {
+  [key: string]: string;
+};

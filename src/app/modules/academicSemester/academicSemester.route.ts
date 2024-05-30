@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import { academicSemesterController } from './academicSemester.controller';
 import { validation } from '../../middlewares/validation';
-import { academicSemesterValidation } from './academicSemester.Validation';
+import {
+  academicSemesterValidation,
+  updateAcademicSemesterValidation,
+} from './academicSemester.Validation';
 
 const route = Router();
 route.post(
@@ -12,5 +15,10 @@ route.post(
 
 route.get('/', academicSemesterController.getAllAcademicSemester);
 route.get('/:id', academicSemesterController.getSingleAcademicSemester);
+route.patch(
+  '/:id',
+  validation(updateAcademicSemesterValidation),
+  academicSemesterController.updateAcademicSemester,
+);
 
 export const academicSemester = route;

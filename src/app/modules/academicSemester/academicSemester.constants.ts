@@ -1,4 +1,4 @@
-import { Code, Month, Name } from './academicSemester.interface';
+import { Code, Month, Name, TCodeChekcer } from './academicSemester.interface';
 
 export const Months: Month[] = [
   'January',
@@ -16,3 +16,8 @@ export const Months: Month[] = [
 
 export const Names: Name[] = ['Autumn', 'Summer', 'Fall'];
 export const Codes: Code[] = ['01', '02', '03'];
+export const codeChecker: TCodeChekcer = {
+  Autumn: '01',
+  Summer: '02',
+  Fall: '03',
+};
