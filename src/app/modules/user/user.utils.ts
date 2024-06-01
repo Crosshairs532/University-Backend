@@ -3,9 +3,13 @@ import { userModel } from './user.model';
 
 const LaststudentId = async () => {
   const lastStudent = await userModel
-    .findOne({
-      role: 'Student',
-    })
+    .findOne(
+      {
+        role: 'student',
+      },
+
+      { id: 1, _id: 0 },
+    )
     .sort({
       createdAt: -1,
     })
@@ -14,10 +18,12 @@ const LaststudentId = async () => {
 };
 // 2030 01 0001
 export const GenerateId = async (payload: TAcademicSemester) => {
-  const currentId = (0).toString(); //0
+  let currentId = (0).toString(); //0
   const lastStudentId = await LaststudentId();
+  console.log(lastStudentId, 'last student');
+  // 2024 01 0001
   const lastSemesterCode = lastStudentId?.substring(4, 6); //01
-  const lastSemesterYear = lastStudentId?.substring(0, 4); //2030
+  const lastSemesterYear = lastStudentId?.substring(0, 4); //2024
 
   const currentSemesterCode = payload.code;
   const currentSemesterYear = payload.year;
@@ -30,6 +36,6 @@ export const GenerateId = async (payload: TAcademicSemester) => {
   }
   let increment = (Number(currentId) + 1).toString().padStart(4, '0');
   increment = `${payload.year}${payload.code}${increment}`;
-  console.log(increment, 'what is this ? ');
+  // console.log(increment, 'what is this ? ');
   return increment;
 };

@@ -18,6 +18,8 @@ const createStudentIntoDB = async (studentData: Student, password: string) => {
     studentData.admissionSemester,
   );
 
+  console.log(admissionSemester, 'Admission Semester');
+
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -27,12 +29,18 @@ const createStudentIntoDB = async (studentData: Student, password: string) => {
     user.role = 'student';
 
     const newUser = await userModel.create([user], { session });
+    console.log(newUser, 'new USer');
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
     }
-    studentData.id = user.id;
-    studentData.user = newUser._id;
+
+    // console.log({ newUser });
+    studentData.id = newUser[0].id;
+    studentData.user = newUser[0]._id;
+
+    // console.log({ studentData });
     const newStudent = await StudentModel.create([studentData], { session });
+    console.log(newStudent, 'new Student');
     if (!newStudent.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student');
     }
