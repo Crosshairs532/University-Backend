@@ -40,4 +40,5 @@ export type Student = {
   isActive: 'active' | 'blocked';
   admissionSemester: Types.ObjectId;
   isDeleted: boolean;
+  academicDepartment: Types.ObjectId;
 };

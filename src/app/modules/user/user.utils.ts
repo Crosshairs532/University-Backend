@@ -30,6 +30,6 @@ export const GenerateId = async (payload: TAcademicSemester) => {
   }
   let increment = (Number(currentId) + 1).toString().padStart(4, '0');
   increment = `${payload.year}${payload.code}${increment}`;
-
+  console.log(increment, 'what is this ? ');
   return increment;
 };

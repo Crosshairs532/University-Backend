@@ -89,10 +89,17 @@ const studentSchema = new Schema<Student>({
   profileImg: { type: String },
   admissionSemester: {
     type: Schema.Types.ObjectId,
-    ref: 'admissionSemester',
+    ref: 'academicSemester',
     required: true,
   },
   isActive: ['active', 'blocked'],
+
+  academicDepartment: {
+    type: Schema.Types.ObjectId,
+    ref: 'academicDepartment',
+    required: true,
+    unique: true,
+  },
 });
 
 export const StudentModel = model<Student>('Student', studentSchema);
