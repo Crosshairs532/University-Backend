@@ -13,6 +13,7 @@ import { handleValidationError } from '../errrors/handleValidationError';
 import { TErrorSource } from '../interfaceErrros/error';
 import { handleCastError } from '../errrors/handleCastError';
 import { handleDuplicateError } from '../errrors/handleDuplicateError';
+import AppError from '../errrors/appError';
 const globalError: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = err.status || httpStatus.INTERNAL_SERVER_ERROR || 500;
   let message = err.message || 'Something went Wrong';
@@ -46,6 +47,23 @@ const globalError: ErrorRequestHandler = (err, req, res, next) => {
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSource = simplifiedError?.errorSource;
+  } else if (err instanceof AppError) {
+    statusCode = err?.statusCode;
+    message = err.message;
+    errorSource = [
+      {
+        path: '',
+        message: err?.message,
+      },
+    ];
+  } else if (err instanceof Error) {
+    message = err.message;
+    errorSource = [
+      {
+        path: '',
+        message: err?.message,
+      },
+    ];
   }
 
   return res.status(statusCode).json({
