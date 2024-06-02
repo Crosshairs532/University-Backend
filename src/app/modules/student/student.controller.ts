@@ -6,10 +6,16 @@ import { catchAsync } from '../../utils/catchAsynch';
 import { sendResponse } from '../../utils/sendResponse';
 import mongoose from 'mongoose';
 import { StudentModel } from './student.model';
+import httpStatus from 'http-status';
 
 const getAllStudents = catchAsync(async (req: Request, res: Response) => {
-  const result = await StudentServices.getAllStudentsFromDB();
-  sendResponse(res, result);
+  const result = await StudentServices.getAllStudentsFromDB(req.query);
+  sendResponse(res, {
+    // statusCode:httpStatus.OK,
+    success: true,
+    message: '',
+    data: result,
+  });
 });
 
 const getSingleStudent = catchAsync(async (req: Request, res: Response) => {

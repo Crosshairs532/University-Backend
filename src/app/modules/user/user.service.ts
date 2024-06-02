@@ -47,10 +47,10 @@ const createStudentIntoDB = async (studentData: Student, password: string) => {
     await session.commitTransaction();
     await session.endSession();
     return newStudent;
-  } catch (err) {
+  } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student');
+    throw new Error(err);
   }
 };
 
