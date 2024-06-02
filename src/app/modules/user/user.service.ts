@@ -6,7 +6,7 @@ import { StudentModel } from '../student/student.model';
 import { Tuser } from './user.interface';
 import { userModel } from './user.model';
 import { GenerateId } from './user.utils';
-import AppError from '../../middlewares/appError';
+import AppError from '../../errrors/appError';
 import httpStatus from 'http-status';
 
 const createStudentIntoDB = async (studentData: Student, password: string) => {
