@@ -11,6 +11,8 @@ import config from '../config';
 import { handleZodError } from '../errrors/handleZodError';
 import { handleValidationError } from '../errrors/handleValidationError';
 import { TErrorSource } from '../interfaceErrros/error';
+import { handleCastError } from '../errrors/handleCastError';
+import { handleDuplicateError } from '../errrors/handleDuplicateError';
 const globalError: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = err.status || httpStatus.INTERNAL_SERVER_ERROR || 500;
   let message = err.message || 'Something went Wrong';
@@ -31,6 +33,16 @@ const globalError: ErrorRequestHandler = (err, req, res, next) => {
     errorSource = simplifiedError?.errorSource;
   } else if (err.name === 'ValidationError') {
     const simplifiedError = handleValidationError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSource = simplifiedError?.errorSource;
+  } else if (err.name === 'castError') {
+    const simplifiedError = handleCastError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSource = simplifiedError?.errorSource;
+  } else if (err.code === 11000) {
+    const simplifiedError = handleDuplicateError(err);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSource = simplifiedError?.errorSource;
