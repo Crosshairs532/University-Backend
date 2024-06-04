@@ -4,7 +4,7 @@ import AppError from '../../errrors/appError';
 import httpStatus from 'http-status';
 import { userModel } from '../user/user.model';
 import { Student } from './student.interface';
-import { object } from 'zod';
+// import { object } from 'zod';
 // import { Student } from './student.interface';
 
 // const createStudentIntoDB = async (student: Student) => {
@@ -14,17 +14,51 @@ import { object } from 'zod';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   let searchTerm = '';
-  console.log(query);
+  const queryObj = { ...query };
   if (query?.searchTerm) {
     searchTerm = query?.searchTerm as string;
   }
 
-  const result = await StudentModel.find({
+  //filtering
+  const excluding = ['searchTerm', 'sort', 'limit', 'page'];
+  excluding.forEach((val) => delete queryObj[val]);
+
+  /* partial finding . email diye specific find korbe then partial find using excluding vals*/
+  const searchQuery = await StudentModel.find({
     $or: ['email', 'name.firstName', 'presentAddress'].map((field) => ({
       [field]: { $regex: searchTerm, $options: 'i' },
     })),
   });
-  return result;
+
+  // next query ta hobe first e searchTerm diye houar por.
+  /*   email diye specific finding. ekhane joto query term ashb e shjob delete hobe shudhu email thakbe   */
+  const filterQuery = searchQuery.find(queryObj);
+
+  /*  SORT */
+
+  let sort = '-createdAt';
+  if (query.sort) {
+    sort = query.sort as string;
+  }
+
+  const sortedQuery = filterQuery.sort(sort);
+
+  /* limit */
+
+  let limit = 1;
+  let skip = 0;
+  let page = 1;
+  if (query.limit) {
+    limit = Number(query.limit);
+  }
+  if (query.page) {
+    page = Number(query.page);
+    skip = (page - 1) * limit;
+  }
+  const paginationQuery = sortedQuery.skip(skip);
+  const limitedQuery = await paginationQuery.limit(limit);
+
+  return limitedQuery;
 };
 
 const getSingleStudentFromDB = async (id: string) => {
