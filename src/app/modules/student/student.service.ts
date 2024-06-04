@@ -6,6 +6,8 @@ import AppError from '../../errrors/appError';
 import httpStatus from 'http-status';
 import { userModel } from '../user/user.model';
 import { Student } from './student.interface';
+import QueryBuilder from '../../QueryBuilder/QueryBuilder';
+import { searchFields } from './student.constant';
 // import { object } from 'zod';
 // import { Student } from './student.interface';
 
@@ -23,62 +25,73 @@ import { Student } from './student.interface';
  */
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-  let searchTerm = '';
-  const queryObj = { ...query };
-  if (query?.searchTerm) {
-    searchTerm = query?.searchTerm as string;
-  }
+  // let searchTerm = '';
+  // const queryObj = { ...query };
+  // if (query?.searchTerm) {
+  //   searchTerm = query?.searchTerm as string;
+  // }
 
-  //filtering
-  const excluding = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
-  excluding.forEach((val) => delete queryObj[val]);
+  // //filtering
+  // const excluding = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+  // excluding.forEach((val) => delete queryObj[val]);
 
   /* partial finding . email diye specific find korbe then partial find using excluding vals*/
-  const searchQuery = await StudentModel.find({
-    $or: ['email', 'name.firstName', 'presentAddress'].map((field) => ({
-      [field]: { $regex: searchTerm, $options: 'i' },
-    })),
-  });
+  // const searchQuery = await StudentModel.find({
+  //   $or: ['email', 'name.firstName', 'presentAddress'].map((field) => ({
+  //     [field]: { $regex: searchTerm, $options: 'i' },
+  //   })),
+  // });
 
   // next query ta hobe first e searchTerm diye houar por.
   /*   email diye specific finding. ekhane joto query term ashb e shjob delete hobe shudhu email thakbe   */
-  const filterQuery = searchQuery.find(queryObj);
+  // const filterQuery = searchQuery.find(queryObj);
 
   /*  SORT */
 
-  let sort = '-createdAt';
-  if (query.sort) {
-    sort = query.sort as string;
-  }
+  // let sort = '-createdAt';
+  // if (query.sort) {
+  //   sort = query.sort as string;
+  // }
 
-  const sortedQuery = filterQuery.sort(sort);
+  // const sortedQuery = filterQuery.sort(sort);
 
   /* limit */
 
-  let limit = 1;
-  let skip = 0;
-  let page = 1;
-  if (query.limit) {
-    limit = Number(query.limit);
-  }
-  if (query.page) {
-    page = Number(query.page);
-    skip = (page - 1) * limit;
-  }
-  const paginationQuery = sortedQuery.skip(skip);
-  const limitedQuery = await paginationQuery.limit(limit);
+  // let limit = 1;
+  // let skip = 0;
+  // let page = 1;
+  // if (query.limit) {
+  //   limit = Number(query.limit);
+  // }
+  // if (query.page) {
+  //   page = Number(query.page);
+  //   skip = (page - 1) * limit;
+  // }
+  // const paginationQuery = sortedQuery.skip(skip);
+  // const limitedQuery = await paginationQuery.limit(limit);
 
   /*============  limiting fields  ===========*/
 
-  let fields = '-__v'; // excluding the __v part. '-' part indicated that i am not taking this  when i am about to show fields.
-  if (query.fields) {
-    fields = (query.fields as string).split(',').join(' ');
-  }
-  const fieldQuery = limitedQuery.select(fields);
+  //   let fields = '-__v'; // excluding the __v part. '-' part indicated that i am not taking this  when i am about to show fields.
+  //   if (query.fields) {
+  //     fields = (query.fields as string).split(',').join(' ');
+  //   }
+  //   const fieldQuery = limitedQuery.select(fields);
 
-  return fieldQuery;
+  //   return fieldQuery;
+  // };
+
+  /* ======================= from class ========================*/
+  const studentQuery = new QueryBuilder(StudentModel.find(), query)
+    .search(searchFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await studentQuery.modelQuery;
+  return result;
 };
-
 const getSingleStudentFromDB = async (id: string) => {
   const result = await StudentModel.findOne({ id })
     .populate('user')
