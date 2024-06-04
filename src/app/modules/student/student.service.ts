@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import mongoose from 'mongoose';
 import { StudentModel } from './student.model';
 import AppError from '../../errrors/appError';
@@ -11,6 +13,14 @@ import { Student } from './student.interface';
 //   const result = await StudentModel.create(student);
 //   return result;
 // };
+/*
+ * searchQuery
+ * filterQuery
+ * sortedQuery
+ * paginationQuery
+ * limitedQuery
+ * fieldQuery
+ */
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   let searchTerm = '';
@@ -20,7 +30,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   }
 
   //filtering
-  const excluding = ['searchTerm', 'sort', 'limit', 'page'];
+  const excluding = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
   excluding.forEach((val) => delete queryObj[val]);
 
   /* partial finding . email diye specific find korbe then partial find using excluding vals*/
@@ -58,7 +68,15 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   const paginationQuery = sortedQuery.skip(skip);
   const limitedQuery = await paginationQuery.limit(limit);
 
-  return limitedQuery;
+  /*============  limiting fields  ===========*/
+
+  let fields = '-__v'; // excluding the __v part. '-' part indicated that i am not taking this  when i am about to show fields.
+  if (query.fields) {
+    fields = (query.fields as string).split(',').join(' ');
+  }
+  const fieldQuery = limitedQuery.select(fields);
+
+  return fieldQuery;
 };
 
 const getSingleStudentFromDB = async (id: string) => {
