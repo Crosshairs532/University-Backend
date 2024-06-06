@@ -55,7 +55,19 @@ const updateCourseDb = async (id: string, payload: Partial<TCourse>) => {
     const deletePreCourses = await courseModel.findByIdAndUpdate(id, {
       $pull: { preRequisiteCourses: { course: { $in: deletePre } } },
     }); // delete all the  courses that was found in deletePre
+
+    const newPre = preRequisiteCourses?.filter(
+      (elem) => elem.course && !elem.course,
+    );
+    const newPreCourse = await courseModel.findByIdAndUpdate(id, {
+      $addToSet: { preRequisiteCourses: { $each: newPre } },
+    });
   }
+
+  const result = await courseModel
+    .findById(id)
+    .populate('preRequisiteCourses.course');
+  return result;
 };
 
 export const courseService = {
