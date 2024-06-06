@@ -19,7 +19,7 @@ const createCourse = catchAsync(
 
 const getAllCourse = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const all = await courseService.getAllCourseDb();
+    const all = await courseService.getAllCourseDb(req.query);
     sendResponse(res, {
       success: true,
       message: 'All course Semesters are retrieved',
@@ -51,9 +51,14 @@ const deleteCourse = catchAsync(
   },
 );
 
+const updateCourse = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {},
+);
+
 export const courseController = {
   createCourse,
   deleteCourse,
   getSingleCourse,
   getAllCourse,
+  updateCourse,
 };

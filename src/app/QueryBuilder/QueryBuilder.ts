@@ -10,6 +10,7 @@ class QueryBuilder<T> {
     this.query = query;
   }
   search(searchFields: string[]) {
+    console.log(searchFields);
     const searchTerm = this?.query?.searchTerm;
     if (this?.query?.searchTerm) {
       this.modelQuery = this.modelQuery.find({
@@ -49,7 +50,9 @@ class QueryBuilder<T> {
 
   fields() {
     const fields =
-      (this?.query?.fields as string).split(',').join(' ') || '-__v';
+      this.query && this.query.fields && typeof this.query.fields === 'string'
+        ? this.query.fields.split(',').join(' ')
+        : '-__v' || null;
 
     this.modelQuery = this.modelQuery.select(fields);
     return this;

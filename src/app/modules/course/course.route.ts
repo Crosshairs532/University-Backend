@@ -1,5 +1,5 @@
+import { validation } from './../../middlewares/validation';
 import { Router } from 'express';
-import { validation } from '../../middlewares/validation';
 import { courseValidation } from './course.validation';
 import { courseController } from './course.controller';
 
@@ -14,5 +14,7 @@ route.post(
 route.get('/:id', courseController.getSingleCourse);
 route.get('/', courseController.getAllCourse);
 route.delete('/:id', courseController.deleteCourse);
+
+route.patch('/:id', validation(courseValidation.updateCourseValidation));
 
 export const courseRoute = route;
