@@ -14,7 +14,16 @@ route.post(
 route.get('/:id', courseController.getSingleCourse);
 route.get('/', courseController.getAllCourse);
 route.delete('/:id', courseController.deleteCourse);
-
+route.put(
+  '/:courseId/assign-faculties',
+  validation(courseValidation.assignFacultyValidation),
+  courseController.assignFaculties,
+);
 route.patch('/:id', validation(courseValidation.updateCourseValidation));
+route.delete(
+  '/:courseId/remove-faculties',
+  validation(courseValidation.updateCourseValidation),
+  courseController.removeFaculties,
+);
 
 export const courseRoute = route;

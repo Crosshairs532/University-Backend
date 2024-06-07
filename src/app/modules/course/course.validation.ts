@@ -26,7 +26,12 @@ const updateCourseValidation = z.object({
   isDeleted: z.string().optional().optional(),
 });
 
+const assignFacultyValidation = z.object({
+  faculties: z.array(z.string()),
+});
+
 export const courseValidation = {
   createCourseValidation,
   updateCourseValidation,
+  assignFacultyValidation,
 };
