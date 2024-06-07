@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import httpStatus from 'http-status';
 import AppError from '../../errrors/appError';
 // import { academicDepartmentModel } from '../academicDepartment/academicDepartment.model';
@@ -60,12 +62,17 @@ const updateSemesterRegistrationDb = async (
   id: string,
   payload: Partial<TSemesterRegistration>,
 ) => {
+  // check if the given semester exists
+  const isTheSemesterExists = await semesterRegistrationModel.findById(id);
+  if (!isTheSemesterExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This semester does not exists!');
+  }
   // check if any semester has ended or not. if Yes then we will not update.
-  const checkEndedSemester = await semesterRegistrationModel.findById(id);
-  if (checkEndedSemester?.status === 'ENDED') {
+  const checkEndedSemester = isTheSemesterExists?.status;
+  if (checkEndedSemester === 'ENDED') {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      `This semester has already ${checkEndedSemester.status}`,
+      `This semester has already ${checkEndedSemester}`,
     );
   }
 };
