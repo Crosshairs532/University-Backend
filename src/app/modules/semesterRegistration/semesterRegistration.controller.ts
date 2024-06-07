@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsynch';
 import { semesterRegistrationService } from './semesterRegistration.service';
@@ -44,12 +46,16 @@ const getSingleSemesterRegistration = catchAsync(
 const updateSemesterRegistration = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-
     const result =
       await semesterRegistrationService.updateSemesterRegistrationDb(
         id,
         req.body,
       );
+    sendResponse(res, {
+      success: true,
+      message: 'semester registrations updated successfully',
+      data: result,
+    });
   },
 );
 
