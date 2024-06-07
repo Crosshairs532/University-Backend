@@ -16,7 +16,7 @@ route.get('/', semesterRegistrationController.getAllSemesterRegistration);
 route.patch(
   '/:id',
   validation(
-    semesterRegistrationValidation.upadateSemesterRegistrationValidationSchema,
+    semesterRegistrationValidation.updateSemesterRegistrationValidationSchema,
   ),
   semesterRegistrationController.updateSemesterRegistration,
 );
