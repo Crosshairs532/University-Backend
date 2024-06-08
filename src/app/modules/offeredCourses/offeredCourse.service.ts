@@ -100,6 +100,35 @@ const createOfferedCourseIntoDb = async (payload: TOfferedCourse) => {
       `section ${section} has already been booked. Try another section`,
     );
   }
+
+  // handle time conflict of the  faculty.
+
+  const assingedSchedules = await OfferedCourseModel.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select('days startTime endTime');
+
+  const newSchedule = {
+    days,
+    startTime,
+    endTime,
+  };
+
+  assingedSchedules.forEach((schedules) => {
+    const existingStartTime = new Date(`1970-01-01T${schedules.startTime}`);
+    const existingEndTime = new Date(`1970-01-01T${schedules.endTime}`);
+    const newEndTime = new Date(`1970-01-01T${newSchedule.endTime}`);
+    const newStartTime = new Date(`1970-01-01T${newSchedule.startTime}`);
+
+    if (newStartTime < existingEndTime && newEndTime > existingEndTime) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Time Conflicts !! choose another time',
+      );
+    }
+  });
+
   const result = await OfferedCourseModel.create({
     ...payload,
     academicSemester,
