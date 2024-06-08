@@ -1,8 +1,109 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import httpStatus from 'http-status';
+import AppError from '../../errrors/appError';
+import { semesterRegistrationModel } from '../semesterRegistration/semesterRegistration.model';
 import { TOfferedCourse } from './offeredCourse.interface';
 import { OfferedCourseModel } from './offeredCourse.model';
+import { academicFacultyModel } from '../academicFaculty/academicFaculty.model';
+import { academicDepartmentModel } from '../academicDepartment/academicDepartment.model';
+import { courseModel } from '../course/course.model';
+import { Faculty } from '../faculty/faculty.model';
 
 const createOfferedCourseIntoDb = async (payload: TOfferedCourse) => {
-  const result = await OfferedCourseModel.create(payload);
+  const {
+    semesterRegistration,
+    academicFaculty,
+    academicDepartment,
+    course,
+    section,
+    faculty,
+    days,
+    startTime,
+    endTime,
+  } = payload;
+
+  /**
+   * Step 1: check if the semester registration id is exists!
+   * Step 2: check if the academic faculty id is exists!
+   * Step 3: check if the academic department id is exists!
+   * Step 4: check if the course id is exists!
+   * Step 5: check if the faculty id is exists!
+   * Step 6: check if the department is belong to the  faculty
+   * Step 7: check if the same offered course same section in same registered semester exists
+   * Step 8: get the schedules of the faculties
+   * Step 9: check if the faculty is available at that time. If not then throw error
+   * Step 10: create the offered course
+   */
+
+  //check if the semester registration id is exists!
+  const isSemesterRegistrationExits =
+    await semesterRegistrationModel.findById(semesterRegistration);
+  if (!isSemesterRegistrationExits) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Semester registration not found !',
+    );
+  }
+  const academicSemester = isSemesterRegistrationExits.academicSemester;
+
+  const isAcademicFacultyExits =
+    await academicFacultyModel.findById(academicFaculty);
+
+  if (!isAcademicFacultyExits) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Academic Faculty not found !');
+  }
+
+  const isAcademicDepartmentExits =
+    await academicDepartmentModel.findById(academicDepartment);
+
+  if (!isAcademicDepartmentExits) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Academic Department not found !');
+  }
+
+  const isCourseExits = await courseModel.findById(course);
+
+  if (!isCourseExits) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Course not found !');
+  }
+
+  const isFacultyExits = await Faculty.findById(faculty);
+
+  if (!isFacultyExits) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found !');
+  }
+
+  // check if the department belong to the faculty
+  const isDepartmentBelongToFaculty = await academicDepartmentModel.findOne({
+    academicFaculty,
+    _id: academicDepartment,
+  });
+  if (!isAcademicDepartmentExits) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      `This Department ${isAcademicDepartmentExits.name} does not belong to ${isAcademicFacultyExits.name}`,
+    );
+  }
+
+  // check if  same section entered in current semester
+  const isSameSectionInCurrentSemesterExists = await OfferedCourseModel.findOne(
+    {
+      section,
+      semesterRegistration,
+      course,
+    },
+  );
+
+  if (isSameSectionInCurrentSemesterExists) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `section ${section} has already been booked. Try another section`,
+    );
+  }
+  const result = await OfferedCourseModel.create({
+    ...payload,
+    academicSemester,
+  });
   return result;
 };
 
