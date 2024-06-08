@@ -9,6 +9,7 @@ import { academicFacultyModel } from '../academicFaculty/academicFaculty.model';
 import { academicDepartmentModel } from '../academicDepartment/academicDepartment.model';
 import { courseModel } from '../course/course.model';
 import { Faculty } from '../faculty/faculty.model';
+import { hasTimeConflict } from './offeredCourse.utils';
 
 const createOfferedCourseIntoDb = async (payload: TOfferedCourse) => {
   const {
@@ -115,19 +116,26 @@ const createOfferedCourseIntoDb = async (payload: TOfferedCourse) => {
     endTime,
   };
 
-  assingedSchedules.forEach((schedules) => {
-    const existingStartTime = new Date(`1970-01-01T${schedules.startTime}`);
-    const existingEndTime = new Date(`1970-01-01T${schedules.endTime}`);
-    const newEndTime = new Date(`1970-01-01T${newSchedule.endTime}`);
-    const newStartTime = new Date(`1970-01-01T${newSchedule.startTime}`);
+  // assingedSchedules.forEach((schedules) => {
+  //   const existingStartTime = new Date(`1970-01-01T${schedules.startTime}`);
+  //   const existingEndTime = new Date(`1970-01-01T${schedules.endTime}`);
+  //   const newEndTime = new Date(`1970-01-01T${newSchedule.endTime}`);
+  //   const newStartTime = new Date(`1970-01-01T${newSchedule.startTime}`);
 
-    if (newStartTime < existingEndTime && newEndTime > existingEndTime) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        'Time Conflicts !! choose another time',
-      );
-    }
-  });
+  //   if (newStartTime < existingEndTime && newEndTime > existingEndTime) {
+  //     throw new AppError(
+  //       httpStatus.BAD_REQUEST,
+  //       'Time Conflicts !! choose another time',
+  //     );
+  //   }
+  // });
+
+  if (hasTimeConflict(assingedSchedules, newSchedule)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Time Conflicts !! choose another time',
+    );
+  }
 
   const result = await OfferedCourseModel.create({
     ...payload,
