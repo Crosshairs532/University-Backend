@@ -17,7 +17,7 @@ const createAcademicDepartment = catchAsync(
   },
 );
 
-const getSingleAcadmeicDepartment = catchAsync(
+const getSingleAcademicDepartment = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -32,7 +32,20 @@ const getSingleAcadmeicDepartment = catchAsync(
     });
   },
 );
+
+const getAllAcademicDepartment = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response) => {
+    const result = await academicDepartmentService.getAllAcademicDepartmentDb();
+    sendResponse(res, {
+      success: true,
+      message: 'All Academic Department is Successfully',
+      data: result,
+    });
+  },
+);
 export const academicDepartmentController = {
   createAcademicDepartment,
-  getSingleAcadmeicDepartment,
+  getSingleAcademicDepartment,
+  getAllAcademicDepartment,
 };

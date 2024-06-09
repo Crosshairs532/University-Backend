@@ -30,7 +30,6 @@ process.on('unhandledRejection', () => {
 });
 
 //  for synchronous behavior
-
 process.on('uncaughtRejection', () => {
   console.log(`UnCaughtRejection is detected, shutting down server....`);
 

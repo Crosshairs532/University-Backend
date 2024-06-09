@@ -10,7 +10,11 @@ const getSingleAcademicDepartmentDb = async (id: string) => {
     .findById({ _id: id })
     .populate('AcademicFaculty');
 };
+const getAllAcademicDepartmentDb = async () => {
+  return await academicDepartmentModel.find().populate('AcademicFaculty');
+};
 export const academicDepartmentService = {
   createAcademicDepartmentDb,
   getSingleAcademicDepartmentDb,
+  getAllAcademicDepartmentDb,
 };

@@ -93,7 +93,6 @@ const studentSchema = new Schema<Student>({
     required: true,
   },
   isActive: ['active', 'blocked'],
-
   academicDepartment: {
     type: Schema.Types.ObjectId,
     ref: 'academicDepartment',

@@ -40,7 +40,6 @@ const userSchema = new Schema<Tuser>(
 userSchema.pre('save', async function (next) {
   const hash = await bcrypt.hash(this.password, Number(config.saltround));
   this.password = hash;
-
   next();
 });
 export const userModel = model<Tuser>('user', userSchema);
