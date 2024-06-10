@@ -47,15 +47,24 @@ userSchema.statics.isUserExistsByCustomId = async function (id: string) {
 };
 
 userSchema.statics.isUserDeletedByCustomId = async function (id: string) {
-  return await userModel.findOne({ id: id, isDeleted: true });
+  const isDeleted = await userModel.findOne({ id: id, isDeleted: true });
+  console.log({ isDeleted });
+  return isDeleted;
 };
 
-userSchema.statics.isUserPasswordMatched = async function (id: string) {
+userSchema.statics.isUserPasswordMatched = async function (
+  password: string,
+  id: string,
+) {
   const isUserExists = await userModel.findOne({ id });
-  return await bcrypt.compare(this?.password, isUserExists?.password);
+  const passwordCheck = await bcrypt.compare(password, isUserExists?.password);
+  console.log(passwordCheck);
+  return passwordCheck;
 };
 
 userSchema.statics.isUserBlocked = async function (id: string) {
-  return await userModel.findOne({ id: id, status: 'blocked' });
+  const isBlocked = await userModel.findOne({ id: id, status: 'blocked' });
+  console.log({ isBlocked });
+  return isBlocked;
 };
 export const userModel = model<Tuser, TuserModel>('user', userSchema);

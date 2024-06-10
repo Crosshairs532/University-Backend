@@ -11,7 +11,7 @@ export interface Tuser {
 export interface TuserModel extends Model<Tuser> {
   isUserExistsByCustomId(id: string): Promise<Tuser>;
   isUserDeletedByCustomId(id: string): Promise<Tuser>;
-  isUserPasswordMatched(id: string): Promise<Tuser>;
-  isUserBlocked(id: string): Promise<Tuser>;
+  isUserPasswordMatched(password: string, id: string): Promise<boolean>;
+  isUserBlocked(id: string): Promise<boolean>;
 }
 // export interface TuserModel extends Model<Tuser> {}

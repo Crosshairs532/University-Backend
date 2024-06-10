@@ -28,8 +28,10 @@ const loginUser = async (payload: TSignUser) => {
   // if (isUserExists?.status === 'blocked') {
   //   throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!');
   // }
-
-  if (await userModel.isUserBlocked) {
+  if (!(await userModel.isUserPasswordMatched(payload.password, payload?.id))) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Password did not matched!');
+  }
+  if (await userModel.isUserBlocked(payload.id)) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!');
   }
 };
