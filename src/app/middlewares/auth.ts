@@ -1,6 +1,5 @@
-import Jwt from 'jsonwebtoken';
+import Jwt, { JwtPayload } from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
-import { AnyZodObject } from 'zod';
 import { catchAsync } from '../utils/catchAsynch';
 import AppError from '../errrors/appError';
 import httpStatus from 'http-status';
@@ -15,7 +14,15 @@ export const auth = () => {
     }
 
     // verify token
-    Jwt.verify(token, config.jwt_secret as string, (err, decoded) => {});
-    next();
+    Jwt.verify(token, config.jwt_secret as string, (err, decoded) => {
+      if (err) {
+        throw new AppError(
+          httpStatus.UNAUTHORIZED,
+          'You are not authorized !!',
+        );
+      }
+      req.user = decoded as JwtPayload;
+      next();
+    });
   });
 };
