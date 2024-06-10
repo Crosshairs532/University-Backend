@@ -1,9 +1,9 @@
 import { Schema, model } from 'mongoose';
-import { Tuser } from './user.interface';
+import { Tuser, TuserModel } from './user.interface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 
-const userSchema = new Schema<Tuser>(
+const userSchema = new Schema<Tuser, TuserModel>(
   {
     id: {
       type: String,
@@ -42,4 +42,20 @@ userSchema.pre('save', async function (next) {
   this.password = hash;
   next();
 });
-export const userModel = model<Tuser>('user', userSchema);
+userSchema.statics.isUserExistsByCustomId = async function (id: string) {
+  return await userModel.findOne({ id });
+};
+
+userSchema.statics.isUserDeletedByCustomId = async function (id: string) {
+  return await userModel.findOne({ id: id, isDeleted: true });
+};
+
+userSchema.statics.isUserPasswordMatched = async function (id: string) {
+  const isUserExists = await userModel.findOne({ id });
+  return await bcrypt.compare(this?.password, isUserExists?.password);
+};
+
+userSchema.statics.isUserBlocked = async function (id: string) {
+  return await userModel.findOne({ id: id, status: 'blocked' });
+};
+export const userModel = model<Tuser, TuserModel>('user', userSchema);
