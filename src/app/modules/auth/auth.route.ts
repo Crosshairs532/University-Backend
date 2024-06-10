@@ -10,3 +10,5 @@ route.post(
   validation(authValidation.loginValidationSchema),
   authController.loginUser,
 );
+
+export const authRoutes = route;
