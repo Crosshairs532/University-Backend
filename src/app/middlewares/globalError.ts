@@ -10,7 +10,7 @@ import { ZodError, ZodIssue } from 'zod';
 import config from '../config';
 import { handleZodError } from '../errrors/handleZodError';
 import { handleValidationError } from '../errrors/handleValidationError';
-import { TErrorSource } from '../interfaceErrros/error';
+import { TErrorSource } from '../interface/error';
 import { handleCastError } from '../errrors/handleCastError';
 import { handleDuplicateError } from '../errrors/handleDuplicateError';
 import AppError from '../errrors/appError';

@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 import { ZodError, ZodIssue } from 'zod';
-import { TGenericErrorResponse } from '../interfaceErrros/error';
+import { TGenericErrorResponse } from '../interface/error';
 // module 14
 
 export const handleZodError = (err: ZodError): TGenericErrorResponse => {
