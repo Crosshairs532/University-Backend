@@ -14,6 +14,9 @@ const userSchema = new Schema<Tuser, TuserModel>(
       required: true,
       select: 0,
     },
+    passwordChangedAt: {
+      type: Date,
+    },
     needsPasswordChange: {
       type: Boolean,
       default: true,
@@ -44,7 +47,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 userSchema.statics.isUserExistsByCustomId = async function (id: string) {
-  return await userModel.findOne({ id });
+  return await userModel.findOne({ id }).select('+password');
 };
 
 userSchema.statics.isUserDeletedByCustomId = async function (id: string) {
