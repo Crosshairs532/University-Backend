@@ -4,11 +4,13 @@ import { validation } from '../../middlewares/validation';
 import { createStudentValidationSchema } from '../student/student.validate';
 import { facultyValidation } from '../faculty/faculty.validation';
 import { createAdminValidationSchema } from '../admin/admin.validation';
+import { auth } from '../../middlewares/auth';
 
 const router = Router();
 
 router.post(
   '/create-student',
+  auth('admins'),
   validation(createStudentValidationSchema),
   userController.createStudent,
 );

@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
+import { USER_ROLE } from './user.constant';
 
 export interface Tuser {
   id: string;
@@ -16,3 +17,4 @@ export interface TuserModel extends Model<Tuser> {
   isUserBlocked(id: string): Promise<boolean>;
 }
 // export interface TuserModel extends Model<Tuser> {}
+export type TuserRole = keyof typeof USER_ROLE;
