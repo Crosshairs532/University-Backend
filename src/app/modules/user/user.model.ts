@@ -52,7 +52,7 @@ userSchema.statics.isUserExistsByCustomId = async function (id: string) {
 
 userSchema.statics.isUserDeletedByCustomId = async function (id: string) {
   const isDeleted = await userModel.findOne({ id: id, isDeleted: true });
-  console.log({ isDeleted });
+  // console.log({ isDeleted });
   return isDeleted;
 };
 
@@ -62,13 +62,21 @@ userSchema.statics.isUserPasswordMatched = async function (
 ) {
   const isUserExists = await userModel.findOne({ id });
   const passwordCheck = await bcrypt.compare(password, isUserExists?.password);
-  console.log(passwordCheck);
+  // console.log(passwordCheck);
   return passwordCheck;
 };
 
 userSchema.statics.isUserBlocked = async function (id: string) {
   const isBlocked = await userModel.findOne({ id: id, status: 'blocked' });
-  console.log({ isBlocked });
+  // console.log({ isBlocked });
   return isBlocked;
 };
+
+userSchema.statics.isJWTissuedbeforePasswordChanged = function (
+  passwordChangeTimeStamp: Date,
+  jwtTimeStamp: number,
+) {
+  return passwordChangeTimeStamp > jwtTimeStamp;
+};
+
 export const userModel = model<Tuser, TuserModel>('user', userSchema);

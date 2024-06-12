@@ -16,6 +16,11 @@ export interface TuserModel extends Model<Tuser> {
   isUserDeletedByCustomId(id: string): Promise<Tuser>;
   isUserPasswordMatched(password: string, id: string): Promise<boolean>;
   isUserBlocked(id: string): Promise<boolean>;
+  isJWTissuedbeforePasswordChanged(
+    passwordChangeTimeStamp: Date,
+    jwtTimeStamp: number,
+  ): boolean;
 }
+
 // export interface TuserModel extends Model<Tuser> {}
 export type TuserRole = keyof typeof USER_ROLE;
