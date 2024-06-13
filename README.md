@@ -22,12 +22,10 @@ import mongoose from 'mongoose';
 import app from './app';
 import config from './app/config';
 import { Server } from 'http';
-
 let server: Server;
 async function main() {
   try {
     await mongoose.connect(config.database_url as string);
-
     server = app.listen(config.port, () => {
       console.log(`app is listening on port ${config.port}`);
     });
@@ -36,7 +34,6 @@ async function main() {
   }
 }
 main();
-
 // for asynchronous  behavior
 process.on('unhandledRejection', () => {
   console.log(`UnhandledRejection is detected, shutting down server....`);
@@ -47,11 +44,9 @@ process.on('unhandledRejection', () => {
   }
   process.exit(1);
 });
-
 //  for synchronous behavior
 process.on('uncaughtRejection', () => {
   console.log(`UnCaughtRejection is detected, shutting down server....`);
-
   process.exit(1);
 });
 
@@ -64,7 +59,6 @@ import router from './app/routes';
 import globalError from './app/middlewares/globalError';
 import cookieParser from 'cookie-parser';
 const app: Application = express();
-
 //parsers
 app.use(express.json());
 app.use(
@@ -73,9 +67,7 @@ app.use(
   }),
 );
 app.use(cookieParser());
-
 app.use('/api/v1', router);
-
 const getAController = (req: Request, res: Response) => {
   const a = 10;
   res.send(a);
@@ -83,11 +75,12 @@ const getAController = (req: Request, res: Response) => {
 
 app.get('/', getAController);
 app.use(globalError);
+app.use(notFound);
 export default app;
 
 ```
-## <font color="red">UTILS !</font> 
-> > ### For Response
+## <font color="red">UTILS!</font> 
+> ### For Response
 ``` javascript
 import { Response } from 'express';
 type Tdata<T> = {
@@ -113,6 +106,125 @@ export const catchAsync = (fn: RequestHandler) => {
     Promise.resolve(fn(req, res, next)).catch((err) => next(err));
   };
 };
+
+```
+
+## Middlewares
+> ### globalError
+```javascript
+
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+import httpStatus from 'http-status';
+import { ZodError, ZodIssue } from 'zod';
+
+const globalError: ErrorRequestHandler = (err, req, res, next) => {
+  let statusCode = err.status || httpStatus.INTERNAL_SERVER_ERROR || 500;
+  let message = err.message || 'Something went Wrong';
+  // module 14
+  let errorSource: TErrorSource = [
+    {
+      path: '',
+      message: 'Something went wrong',
+    },
+  ];
+  // module 14
+  if (err instanceof ZodError) {
+    const simplifiedError = handleZodError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSource = simplifiedError?.errorSource;
+  } else if (err.name === 'ValidationError') {
+    const simplifiedError = handleValidationError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSource = simplifiedError?.errorSource;
+  } else if (err.name === 'castError') {
+    const simplifiedError = handleCastError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSource = simplifiedError?.errorSource;
+  } else if (err.code === 11000) {
+    const simplifiedError = handleDuplicateError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSource = simplifiedError?.errorSource;
+  } else if (err instanceof AppError) {
+    statusCode = err?.statusCode;
+    message = err.message;
+    errorSource = [
+      {
+        path: '',
+        message: err?.message,
+      },
+    ];
+  } else if (err instanceof Error) {
+    message = err.message;
+    errorSource = [
+      {
+        path: '',
+        message: err?.message,
+      },
+    ];
+  }
+  return res.status(statusCode).json({
+    success: false,
+    message: err || message,
+    errorSource,
+    stack: config.node_env == 'development' ? err.stack : null,
+  });
+};
+export default globalError;
+/*
+  \  pattern | 
+  success
+  message
+  errorSources:[
+    path:""
+,
+    message:''
+  ]
+  stack
+*/
+```
+> ### notFound
+```javascript
+import { Request, Response } from 'express';
+const notFound = (req: Request, res: Response) => {
+  return res.status(404).json({
+    success: false,
+    message: 'API not found',
+  });
+};
+export default notFound;
+```
+> ### validations
+``` javascript
+import { NextFunction, Request, Response } from 'express';
+import { AnyZodObject } from 'zod';
+export const validation = (schema: AnyZodObject) => {
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    await schema.parseAsync(req.body);
+    next();
+  });
+};
+```
+## Errors
+> ### AppError
+```javascript
+class AppError extends Error {
+  public statusCode: number;
+  constructor(statusCode: number, message: string, stack = '') {
+    super(message);
+    this.statusCode = statusCode;
+
+    if (stack) {
+      this.stack = stack;
+    } else {
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
+}
+export default AppError;
 
 ```
 
