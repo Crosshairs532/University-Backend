@@ -227,4 +227,82 @@ class AppError extends Error {
 export default AppError;
 
 ```
+> ### handleCastError
+```javascript
+import mongoose from 'mongoose';
+import { TErrorSource, TGenericErrorResponse } from '../interface/error';
+export const handleCastError = (
+  err: mongoose.Error.CastError,
+): TGenericErrorResponse => {
+  const statusCode = 400;
+  const errorSource: TErrorSource = [{ path: err.path, message: err.message }];
+  return {
+    statusCode,
+    message: 'Invalid Id',
+    errorSource,
+  };
+};
+```
+>### DuplicteError
+```javascript
+import { TErrorSource, TGenericErrorResponse } from '../interface/error';
+export const handleDuplicateError = (err: any): TGenericErrorResponse => {
+  const statusCode = 400;
+  const match = err.message.match(/"([^"]*)"/);
+  const extracted_msg = match && match[1];
+  const errorSource: TErrorSource = [
+    { path: '', message: ` ${extracted_msg} is already exists ` },
+  ];
+  return {
+    statusCode,
+    message: 'Duplicated Error',
+    errorSource,
+  };
+};
+```
+>### ValidationError
+```javascript
+import mongoose from 'mongoose';
+import { TErrorSource, TGenericErrorResponse } from '../interface/error';
+
+export const handleValidationError = (
+  err: mongoose.Error.ValidationError,
+): TGenericErrorResponse => {
+  const errorSource: TErrorSource = Object.values(err.errors).map((val) => {
+    return {
+      path: val.name,
+      message: val.message,
+    };
+  });
+  const statusCode = 400;
+  return {
+    statusCode,
+    message: 'validation Error',
+    errorSource,
+  };
+};
+
+```
+> ### Zod validation
+```javascript
+import { ZodError, ZodIssue } from 'zod';
+import { TGenericErrorResponse } from '../interface/error';
+// module 14
+export const handleZodError = (err: ZodError): TGenericErrorResponse => {
+  let statusCode = 400;
+  let errorSource = err.issues.map((issue: ZodIssue) => {
+    return {
+      path: issue?.path[issue.path.length - 1],
+      message: issue.message,
+    };
+  });
+  return {
+    statusCode,
+    message: 'Zod Validation Error',
+    errorSource,
+  };
+};
+```
+
+
 
