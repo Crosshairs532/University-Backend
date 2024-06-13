@@ -86,8 +86,8 @@ app.use(globalError);
 export default app;
 
 ```
-> ### 
-> ### For Response
+> [! UTILS]
+> > ### For Response
 ``` javascript
 import { Response } from 'express';
 type Tdata<T> = {
@@ -115,3 +115,4 @@ export const catchAsync = (fn: RequestHandler) => {
 };
 
 ```
+
