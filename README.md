@@ -1,5 +1,5 @@
-> [!IMPORTANT] Custom functions! 
-  
+> [!IMPORTANT]
+> 
 > For Response
 ``` javascript
 import { Response } from 'express';
