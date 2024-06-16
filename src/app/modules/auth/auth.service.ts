@@ -152,9 +152,45 @@ const forgetPassword = async (id: string) => {
   // console.log({ isUser });
   sendMail(isUser?.email, resetLink);
 };
+
+const resetPassword = async (body, token) => {
+  const isUser = await userModel.findOne(body?.id);
+  if (!isUser) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is Not Found!');
+  }
+  if (await userModel.isUserDeletedByCustomId(body?.id)) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is already deleted!');
+  }
+
+  if (await userModel.isUserBlocked(body?.id)) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!');
+  }
+  const decoded = Jwt.verify(token, config.jwt_secret as string) as JwtPayload;
+
+  if (!(decoded.userId === body?.id)) {
+    throw new AppError(httpStatus.FORBIDDEN, 'you are forbiden');
+  }
+
+  const newHashedPaassword = await bcrypt.hash(
+    body?.newPassword,
+    Number(config.saltround),
+  );
+  await userModel.findOneAndUpdate(
+    {
+      id: body.id,
+      role: body.role,
+    },
+    {
+      password: body?.newPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),
+    },
+  );
+};
 export const authService = {
   loginUser,
   changePassword,
   RefreshToken,
   forgetPassword,
+  resetPassword,
 };
