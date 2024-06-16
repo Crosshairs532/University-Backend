@@ -17,7 +17,7 @@ export const auth = (...required_roles: TuserRole[]) => {
 
     // verify token
     const decoded = Jwt.verify(token, config.jwt_secret as string);
-    const { role, userId, iat } = decoded;
+    const { userId, iat } = decoded as JwtPayload;
 
     const isUser = await userModel.findOne(userId);
 
@@ -44,14 +44,14 @@ export const auth = (...required_roles: TuserRole[]) => {
 
     if (
       isUser?.passwordChangedAt &&
-      isUser.isJWTissuedbeforePasswordChanged(
-        new Date(isUser.passwordChangedAt).getTime() / 1000,
+      userModel.isJWTissuedbeforePasswordChanged(
+        isUser.passwordChangedAt,
         iat as number,
       )
     ) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized !!');
     }
-    if (required_roles && !required_roles.includes(decoded?.role)) {
+    if (required_roles && !required_roles.includes(role)) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized !!');
     }
     req.user = decoded as JwtPayload;

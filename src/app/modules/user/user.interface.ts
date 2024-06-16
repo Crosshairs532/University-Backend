@@ -4,6 +4,7 @@ import { USER_ROLE } from './user.constant';
 
 export interface Tuser {
   id: string;
+  email: string;
   password: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;

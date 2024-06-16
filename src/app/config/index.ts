@@ -10,4 +10,5 @@ export default {
   defaultPassword: process.env.defaultPassword,
   saltround: process.env.SALT_ROUND,
   jwt_secret: process.env.jwt_secret,
+  jwt_refresh_token: process.env.jwt_refresh_token,
 };

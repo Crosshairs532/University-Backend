@@ -1,14 +1,18 @@
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
-// import { StudentRoutes } from './app/modules/student/student.route';
 import router from './app/routes';
 import globalError from './app/middlewares/globalError';
-
+import cookieParser from 'cookie-parser';
 const app: Application = express();
 
 //parsers
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: [''],
+  }),
+);
+app.use(cookieParser());
 
 app.use('/api/v1', router);
 

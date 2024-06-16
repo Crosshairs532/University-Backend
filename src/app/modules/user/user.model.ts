@@ -9,6 +9,9 @@ const userSchema = new Schema<Tuser, TuserModel>(
       type: String,
       required: [true, 'ID is required'],
     },
+    email: {
+      type: String,
+    },
     password: {
       type: String,
       required: true,
@@ -76,7 +79,8 @@ userSchema.statics.isJWTissuedbeforePasswordChanged = function (
   passwordChangeTimeStamp: Date,
   jwtTimeStamp: number,
 ) {
-  return passwordChangeTimeStamp > jwtTimeStamp;
+  const passChangedTime = new Date(passwordChangeTimeStamp).getTime() / 1000;
+  return passChangedTime > jwtTimeStamp;
 };
 
 export const userModel = model<Tuser, TuserModel>('user', userSchema);

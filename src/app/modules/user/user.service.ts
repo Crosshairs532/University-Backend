@@ -33,6 +33,7 @@ const createStudentIntoDB = async (studentData: Student, password: string) => {
     // console.log(user.id, 'checking');
     user.password = password ? password : config.defaultPassword;
     user.role = 'student';
+    user.email = studentData.email;
 
     const newUser = await userModel.create([user], { session });
     // console.log(newUser, 'new USer');
@@ -79,15 +80,16 @@ const createFacultyDb = async (facultyData: TFaculty, password: string) => {
     user.role = 'faculty';
     user.id = await generateFacultyId();
     user.password = password ? password : (config.defaultPassword as string);
+    user.email = facultyData.email;
     const userFacutly = await userModel.create([user], { session });
     if (!userFacutly) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user!');
     }
-    console.log(userFacutly);
+    // console.log(userFacutly);
     facultyData.user = userFacutly[0]._id;
     facultyData.id = userFacutly[0].id;
 
-    console.log(facultyData);
+    // console.log(facultyData);
 
     const faculty = await Faculty.create([facultyData], { session });
     if (!faculty) {
@@ -112,6 +114,7 @@ const createAdminDb = async (password: string, payload: TAdmin) => {
 
   //set student role
   userData.role = 'admin';
+  userData.email = payload.email;
 
   const session = await mongoose.startSession();
 
@@ -119,11 +122,11 @@ const createAdminDb = async (password: string, payload: TAdmin) => {
     session.startTransaction();
     //set  generated id
     userData.id = await generateAdminId();
-    console.log({ userData });
+    // console.log({ userData });
 
     // create a user (transaction-1)
     const newUser = await userModel.create([userData], { session });
-    console.log({ newUser });
+    // console.log({ newUser });
     //create a admin
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create admin');
@@ -131,7 +134,7 @@ const createAdminDb = async (password: string, payload: TAdmin) => {
     // set id , _id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
-    console.log({ payload });
+    // console.log({ payload });
     // create a admin (transaction-2)
     const newAdmin = await AdminModel.create([payload], { session });
 

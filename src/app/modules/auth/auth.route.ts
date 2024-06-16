@@ -20,4 +20,15 @@ route.post(
   authController.loginUser,
 );
 
+route.post(
+  '/refresh-token',
+  validation(authValidation.refreshTokenValidationSchema),
+  authController.refreshToken,
+);
+
+route.post(
+  '/forget-password',
+  validation(authValidation.forgetPasswordValidation),
+  authController.forgetPassword,
+);
 export const authRoutes = route;

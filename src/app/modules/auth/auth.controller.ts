@@ -2,9 +2,15 @@ import { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsynch';
 import { sendResponse } from '../../utils/sendResponse';
 import { authService } from './auth.service';
+import config from '../../config';
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.loginUser(req.body);
+  const { refreshToken, token, needsPasswordChange } = result;
+  res.cookie('refreshTOken', refreshToken, {
+    secure: config.node_env === 'production',
+    httpOnly: true,
+  });
 
   sendResponse(res, {
     success: true,
@@ -24,7 +30,31 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const refreshToken = catchAsync(async (req, res) => {
+  const { refreshToken } = req.cookies;
+  const result = authService.RefreshToken(refreshToken);
+
+  sendResponse(res, {
+    success: true,
+    message: 'Access token is retrieved succesfully!',
+    data: result,
+  });
+});
+
+const forgetPassword = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.body.id;
+  console.log(userId);
+  const result = await authService.forgetPassword(userId);
+  sendResponse(res, {
+    success: true,
+    message: 'Reset link is generated successfully',
+    data: result,
+  });
+});
+
 export const authController = {
   loginUser,
   changePassword,
+  refreshToken,
+  forgetPassword,
 };
