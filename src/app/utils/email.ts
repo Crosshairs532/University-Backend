@@ -1,21 +1,23 @@
 import nodemailer from 'nodemailer';
 import config from '../config';
-export const sendMail = async (email, link) => {
+export const sendMail = async (email: string, link: string) => {
+  console.log({ email, link });
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
     secure: config.node_env === 'production', // Use `true` for port 465, `false` for all other ports
     auth: {
-      user: 'samsularefin532@gmail.com',
-      pass: 'uxnl inig fobm agdi',
+      user: 'samsularefin533@gmail.com',
+      pass: 'ikoi qmcf csal molz',
     },
+    debug: true,
   });
 
   await transporter.sendMail({
-    from: 'samsularefin532@gmail.com', // sender address
-    to: `${email}`, // list of receivers
-    subject: 'Hello ✔', // Subject line
-    text: `${link}`, // plain text body
-    html: '<b>Hello world?</b>', // html body
+    from: 'samsularefin533@gmail.com',
+    to: `${email}`,
+    subject: 'Reset Your password',
+    text: `${link}`,
+    html: `<p>Click the following link to reset your password: <a href="${link}">${link}</a></p>`, // Ensure html content is correctly defined
   });
 };

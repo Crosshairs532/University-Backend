@@ -129,7 +129,7 @@ const RefreshToken = async (token: string) => {
 };
 
 const forgetPassword = async (id: string) => {
-  const isUser = await userModel.findOne({ _id: id });
+  const isUser = await userModel.findOne({ id });
   if (!isUser) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is Not Found!');
   }
@@ -148,7 +148,9 @@ const forgetPassword = async (id: string) => {
   const token = authUtils.createToken(jwtPayload);
 
   const resetLink = `https://localhost:2000?id?=${id}&token=${token}`;
-  sendMail(isUser.email, resetLink);
+  // console.log(resetLink);
+  // console.log({ isUser });
+  sendMail(isUser?.email, resetLink);
 };
 export const authService = {
   loginUser,
