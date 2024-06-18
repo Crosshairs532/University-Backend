@@ -24,14 +24,16 @@ const createStudent = catchAsync(
 
 const createFaculty = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { password, faculty } = req.body;
-    const result = await userServices.createFacultyDb(faculty, password);
-    console.log(result);
-    sendResponse(res, {
-      success: true,
-      message: 'Faculty Created Successfully',
-      data: result,
-    });
+    console.log({ file: req.file });
+    console.log({ data: req.body.data });
+    // const { password, faculty } = req.body;
+    // const result = await userServices.createFacultyDb(faculty, password);
+    // console.log(result);
+    // sendResponse(res, {
+    //   success: true,
+    //   message: 'Faculty Created Successfully',
+    //   data: result,
+    // });
   },
 );
 const createAdmin = catchAsync(

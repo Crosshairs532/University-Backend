@@ -17,6 +17,7 @@ import { AdminModel } from '../admin/admin.model';
 import { TAdmin } from '../admin/admin.interface';
 import { authUtils } from '../auth/auth.utils';
 import { JwtPayload } from 'jsonwebtoken';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const createStudentIntoDB = async (studentData: Student, password: string) => {
   const user: Partial<Tuser> = {};
@@ -37,6 +38,8 @@ const createStudentIntoDB = async (studentData: Student, password: string) => {
     user.password = password ? password : config.defaultPassword;
     user.role = 'student';
     user.email = studentData.email;
+    // send image to Cloudinary
+    sendImageToCloudinary();
 
     const newUser = await userModel.create([user], { session });
     // console.log(newUser, 'new USer');
