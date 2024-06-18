@@ -4,6 +4,8 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { userServices } from './user.service';
 import { sendResponse } from '../../utils/sendResponse';
 import { catchAsync } from '../../utils/catchAsynch';
+import AppError from '../../errrors/appError';
+import httpStatus from 'http-status';
 
 const createStudent = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -46,4 +48,25 @@ const createAdmin = catchAsync(
   },
 );
 
-export const userController = { createStudent, createFaculty, createAdmin };
+const getMe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const token = req.headers.authorization;
+    if (!token) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Token not found!');
+    }
+    const result = await userServices.getMeDb(token);
+    // console.log(result);
+    sendResponse(res, {
+      success: true,
+      message: 'data retrieved successfully',
+      data: result,
+    });
+  },
+);
+
+export const userController = {
+  createStudent,
+  createFaculty,
+  createAdmin,
+  getMe,
+};

@@ -1,3 +1,4 @@
+import { FacultyModel } from './../faculty/faculty.interface';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import config from '../../config';
@@ -14,6 +15,8 @@ import { Faculty } from '../faculty/faculty.model';
 import { academicDepartmentModel } from '../academicDepartment/academicDepartment.model';
 import { AdminModel } from '../admin/admin.model';
 import { TAdmin } from '../admin/admin.interface';
+import { authUtils } from '../auth/auth.utils';
+import { JwtPayload } from 'jsonwebtoken';
 
 const createStudentIntoDB = async (studentData: Student, password: string) => {
   const user: Partial<Tuser> = {};
@@ -153,8 +156,27 @@ const createAdminDb = async (password: string, payload: TAdmin) => {
   }
 };
 
+const getMeDb = async (token: string) => {
+  const decoded = authUtils.verifyToken(token, config.jwt_secret as string);
+
+  const { userId, role } = decoded as JwtPayload;
+  let result = null;
+  if (role === 'student') {
+    result = await StudentModel.findOne({ id: userId });
+  }
+  if (role === 'student') {
+    result = await AdminModel.findOne({ id: userId });
+  }
+  if (role === 'student') {
+    result = await Faculty.findOne({ id: userId });
+  }
+
+  return result;
+};
+
 export const userServices = {
   createStudentIntoDB,
   createFacultyDb,
   createAdminDb,
+  getMeDb,
 };

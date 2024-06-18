@@ -11,7 +11,12 @@ const refreshToken = (JwtPayload: { userId: string; role: string }) => {
   });
 };
 
+const verifyToken = (token: string, secret: string) => {
+  return Jwt.verify(token, secret);
+};
+
 export const authUtils = {
   createToken,
   refreshToken,
+  verifyToken,
 };
