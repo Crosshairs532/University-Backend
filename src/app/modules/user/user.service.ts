@@ -156,27 +156,34 @@ const createAdminDb = async (password: string, payload: TAdmin) => {
   }
 };
 
-const getMeDb = async (token: string) => {
-  const decoded = authUtils.verifyToken(token, config.jwt_secret as string);
+const getMeDb = async (userId: string, role: string) => {
+  // const decoded = authUtils.verifyToken(token, config.jwt_secret as string);
 
-  const { userId, role } = decoded as JwtPayload;
+  // const { userId, role } = decoded as JwtPayload;
+
   let result = null;
   if (role === 'student') {
     result = await StudentModel.findOne({ id: userId });
   }
-  if (role === 'student') {
+  if (role === 'admin') {
     result = await AdminModel.findOne({ id: userId });
   }
-  if (role === 'student') {
+  if (role === 'faculty') {
     result = await Faculty.findOne({ id: userId });
   }
 
   return result;
 };
-
+const changeStatusDb = async (id: string, payload: { status: string }) => {
+  const result = await userModel.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
 export const userServices = {
   createStudentIntoDB,
   createFacultyDb,
   createAdminDb,
   getMeDb,
+  changeStatusDb,
 };

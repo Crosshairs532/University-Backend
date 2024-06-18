@@ -170,7 +170,6 @@ const resetPassword = async (body, token) => {
   if (!(decoded.userId === body?.id)) {
     throw new AppError(httpStatus.FORBIDDEN, 'you are forbiden');
   }
-
   const newHashedPaassword = await bcrypt.hash(
     body?.newPassword,
     Number(config.saltround),

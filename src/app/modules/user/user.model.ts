@@ -64,6 +64,7 @@ userSchema.statics.isUserPasswordMatched = async function (
   id: string,
 ) {
   const isUserExists = await userModel.findOne({ id });
+  console.log({ isUserExists });
   const passwordCheck = await bcrypt.compare(password, isUserExists?.password);
   // console.log(passwordCheck);
   return passwordCheck;

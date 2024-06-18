@@ -51,14 +51,29 @@ const createAdmin = catchAsync(
 const getMe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
-    if (!token) {
-      throw new AppError(httpStatus.NOT_FOUND, 'Token not found!');
-    }
-    const result = await userServices.getMeDb(token);
+    // if (!token) {
+    //   throw new AppError(httpStatus.NOT_FOUND, 'Token not found!');
+    // }
+    console.log({ user: req.user });
+    const { userId, role } = req.user;
+    const result = await userServices.getMeDb(userId, role);
     // console.log(result);
     sendResponse(res, {
       success: true,
-      message: 'data retrieved successfully',
+      message: 'user is retrieved successfully',
+      data: result,
+    });
+  },
+);
+
+const changeStatus = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const result = await userServices.changeStatusDb(id, req.body);
+
+    sendResponse(res, {
+      success: true,
+      message: 'status is updated successfully',
       data: result,
     });
   },
@@ -69,4 +84,5 @@ export const userController = {
   createFaculty,
   createAdmin,
   getMe,
+  changeStatus,
 };

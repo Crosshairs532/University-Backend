@@ -1,4 +1,4 @@
-import Jwt, { JwtPayload } from 'jsonwebtoken';
+import Jwt, { JwtPayload, decode } from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import { catchAsync } from '../utils/catchAsynch';
 import AppError from '../errrors/appError';
@@ -17,9 +17,10 @@ export const auth = (...required_roles: TuserRole[]) => {
 
     // verify token
     const decoded = Jwt.verify(token, config.jwt_secret as string);
+
     const { userId, iat } = decoded as JwtPayload;
 
-    const isUser = await userModel.findOne(userId);
+    const isUser = await userModel.isUserExistsByCustomId(userId);
 
     if (!(await userModel.isUserExistsByCustomId(userId))) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user does not exists!');
@@ -29,19 +30,11 @@ export const auth = (...required_roles: TuserRole[]) => {
     if (await userModel.isUserDeletedByCustomId(userId)) {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is already deleted!');
     }
-    if (
-      !(await userModel.isUserPasswordMatched(
-        payload.oldPassword,
-        userData?.id,
-      ))
-    ) {
-      throw new AppError(httpStatus.FORBIDDEN, 'Password did not matched!');
-    }
+
     if (await userModel.isUserBlocked(userId)) {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!');
     }
     const role = (decoded as JwtPayload).role;
-
     if (
       isUser?.passwordChangedAt &&
       userModel.isJWTissuedbeforePasswordChanged(
