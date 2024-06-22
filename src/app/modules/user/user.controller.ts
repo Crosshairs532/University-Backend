@@ -9,8 +9,11 @@ import httpStatus from 'http-status';
 
 const createStudent = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    const file = req.file;
+    // console.log({ data: req.body });
     const { password, student: studentData } = req.body;
     const result = await userServices.createStudentIntoDB(
+      file,
       studentData,
       password,
     );
@@ -24,16 +27,14 @@ const createStudent = catchAsync(
 
 const createFaculty = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log({ file: req.file });
-    console.log({ data: req.body.data });
-    // const { password, faculty } = req.body;
-    // const result = await userServices.createFacultyDb(faculty, password);
+    const { password, faculty } = req.body;
+    const result = await userServices.createFacultyDb(faculty, password);
     // console.log(result);
-    // sendResponse(res, {
-    //   success: true,
-    //   message: 'Faculty Created Successfully',
-    //   data: result,
-    // });
+    sendResponse(res, {
+      success: true,
+      message: 'Faculty Created Successfully',
+      data: result,
+    });
   },
 );
 const createAdmin = catchAsync(

@@ -1,4 +1,3 @@
-import { FacultyModel } from './../faculty/faculty.interface';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import config from '../../config';
@@ -15,11 +14,15 @@ import { Faculty } from '../faculty/faculty.model';
 import { academicDepartmentModel } from '../academicDepartment/academicDepartment.model';
 import { AdminModel } from '../admin/admin.model';
 import { TAdmin } from '../admin/admin.interface';
-import { authUtils } from '../auth/auth.utils';
-import { JwtPayload } from 'jsonwebtoken';
+// import { authUtils } from '../auth/auth.utils';
+// import { JwtPayload } from 'jsonwebtoken';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
-const createStudentIntoDB = async (studentData: Student, password: string) => {
+const createStudentIntoDB = async (
+  file: any,
+  studentData: Student,
+  password: string,
+) => {
   const user: Partial<Tuser> = {};
   /*
     Generate Student ID
@@ -27,9 +30,7 @@ const createStudentIntoDB = async (studentData: Student, password: string) => {
   const admissionSemester = await academicSemesterModel.findById(
     studentData.admissionSemester,
   );
-
-  // console.log(admissionSemester, 'Admission Semester');
-
+  console.log(admissionSemester, 'Admission Semester');
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -39,7 +40,10 @@ const createStudentIntoDB = async (studentData: Student, password: string) => {
     user.role = 'student';
     user.email = studentData.email;
     // send image to Cloudinary
-    sendImageToCloudinary();
+    const imageName = `${studentData?.name?.firstName}`;
+    const path = file?.path;
+    const { secure_url } = await sendImageToCloudinary(imageName, path);
+    console.log({ path, secure_url });
 
     const newUser = await userModel.create([user], { session });
     // console.log(newUser, 'new USer');
@@ -50,10 +54,11 @@ const createStudentIntoDB = async (studentData: Student, password: string) => {
     // console.log({ newUser });
     studentData.id = newUser[0].id;
     studentData.user = newUser[0]._id;
+    studentData.profileImg = secure_url;
 
     // console.log({ studentData });
     const newStudent = await StudentModel.create([studentData], { session });
-    // console.log(newStudent, 'new Student');
+    console.log(newStudent, 'new Student');
     if (!newStudent.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student');
     }
