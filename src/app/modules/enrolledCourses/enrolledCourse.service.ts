@@ -128,7 +128,7 @@ const createEnrolledCourseIntoDB = async (
     if (!result) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        'Failed to enroll in this cousre !',
+        'Failed to enroll in this course !',
       );
     }
 
